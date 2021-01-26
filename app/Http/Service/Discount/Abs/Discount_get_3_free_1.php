@@ -26,8 +26,7 @@ abstract class Discount_get_3_free_1 extends Discount
 
     public function create_discount_product() : Product
     {
-        // TODO 改成靜態物件
-        return (new product($this->get_free_id))
+        return (resolve(Product::class, ["id" => $this->get_free_id]))
             ->set_price(config("product.{$this->get_free_id}.price") * -1)
             ->set_name($this->discount_product_name)
             ->set_discount_class_name(static::class)

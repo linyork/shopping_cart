@@ -27,8 +27,7 @@ abstract class Discount_get_10_get_discount extends Discount
 
     public function create_discount_product() : Product
     {
-        // TODO 改成靜態物件
-        return (new product($this->get_10_id))
+        return (resolve(Product::class, ["id" => $this->get_10_id]))
             ->set_price((config("product.{$this->get_10_id}.price") - $this->get_discount_price) * -1)
             ->set_name($this->discount_product_name)
             ->set_discount_class_name(static::class)

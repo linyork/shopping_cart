@@ -67,10 +67,9 @@ class Cart
         {
             if ( is_numeric($product) )
             {
-                // TODO 改成靜態物件
-                $this->add_product((new product($product))->set_discount_class_name(static::class));
+                $this->add_product((resolve(Product::class, ["id" => $product]))->set_discount_class_name(static::class));
             }
-            elseif ( $product instanceof product )
+            elseif ( $product instanceof Product )
             {
                 $this->product_list[$product->get_discount_class_name()][] = $product;
             }
