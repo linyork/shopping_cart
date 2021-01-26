@@ -2,7 +2,7 @@
 
 namespace App\Http\Service\Product;
 
-use Exception;
+use App\Exceptions\ProductException;
 
 class Product
 {
@@ -14,21 +14,14 @@ class Product
 
     public function __construct(int $id)
     {
-        try
+        if ( ! config("product.{$id}") )
         {
-            if ( ! config("product.{$id}") )
-            {
-                throw new Exception('No this id\'s product.');
-            }
-            $this->set_id($id);
-            $this->set_name(config("product.{$id}.name"));
-            $this->set_price(config("product.{$id}.price"));
-            $this->set_discount_product(false);
+            throw new ProductException('No this id\'s product.');
         }
-        catch (Exception $e)
-        {
-            echo $e->getMessage();
-        }
+        $this->set_id($id);
+        $this->set_name(config("product.{$id}.name"));
+        $this->set_price(config("product.{$id}.price"));
+        $this->set_discount_product(false);
     }
 
     private function set_id(int $id) : self

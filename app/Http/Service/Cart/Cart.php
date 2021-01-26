@@ -4,7 +4,7 @@ namespace App\Http\Service\Cart;
 
 use App\Http\Service\Discount\Abs\Discount;
 use App\Http\Service\Product\Product;
-use Exception;
+use App\Exceptions\ProductException;
 
 class Cart
 {
@@ -63,24 +63,17 @@ class Cart
 
     public function add_product($product) : void
     {
-        try
+        if ( is_numeric($product) )
         {
-            if ( is_numeric($product) )
-            {
-                $this->add_product((resolve(Product::class, ["id" => $product]))->set_discount_class_name(static::class));
-            }
-            elseif ( $product instanceof Product )
-            {
-                $this->product_list[$product->get_discount_class_name()][] = $product;
-            }
-            else
-            {
-                throw new Exception('$product not numeric or not a product object.');
-            }
+            $this->add_product((resolve(Product::class, ["id" => $product]))->set_discount_class_name(static::class));
         }
-        catch (Exception $e)
+        elseif ( $product instanceof Product )
         {
-            echo $e->getMessage();
+            $this->product_list[$product->get_discount_class_name()][] = $product;
+        }
+        else
+        {
+            throw new ProductException('$product not numeric or not a product object.');
         }
     }
 
@@ -122,31 +115,22 @@ class Cart
 
     public function get_quantity(int $product_id) : int
     {
-        try
+        if ( ! is_numeric($product_id) )
         {
-            if ( ! is_numeric($product_id) )
+            throw new ProductException('Not numeric.');
+        }
+        if ( ! empty($this->product_list[static::class]) )
+        {
+            $total = 0;
+            foreach ($this->product_list[static::class] as $product)
             {
-                throw new Exception('Not numeric.');
-            }
-            if ( ! empty($this->product_list[static::class]) )
-            {
-                $total = 0;
-                foreach ($this->product_list[static::class] as $product)
+                if ( $product->get_id() === $product_id )
                 {
-                    if ( $product->get_id() === $product_id )
-                    {
-                        $total += 1;
-                    }
+                    $total += 1;
                 }
             }
-
-            return $total ?? 0;
         }
-        catch (Exception $e)
-        {
-            echo $e->getMessage();
-            return 0;
-        }
+        return $total ?? 0;
     }
 
     public function total() : int

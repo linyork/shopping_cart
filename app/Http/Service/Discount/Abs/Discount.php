@@ -4,7 +4,7 @@ namespace App\Http\Service\Discount\Abs;
 
 use App\Http\Service\Cart\Cart;
 use App\Http\Service\Product\Product;
-use Exception;
+use App\Exceptions\PromotionsException;
 
 abstract class Discount
 {
@@ -14,19 +14,12 @@ abstract class Discount
 
     private function verify() : void
     {
-        try
+        foreach (get_object_vars($this) as $key => $value)
         {
-            foreach (get_object_vars($this) as $key => $value)
+            if ( empty($this->$key) )
             {
-                if ( empty($this->$key) )
-                {
-                    throw new Exception("Not Found " . $key . " in " . static::class . " class.");
-                }
+                throw new PromotionsException("Undefined [\$this->" . $key . "] in [" . static::class . "] class.");
             }
-        }
-        catch (Exception $e)
-        {
-            echo $e->getMessage();
         }
     }
 
