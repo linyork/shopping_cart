@@ -1,0 +1,57 @@
+version: "3"
+
+networks:
+  backend:
+  frontend:
+
+services:
+
+  # web-server
+  web-server:
+    container_name: nginx
+    networks:
+      - frontend
+      - backend
+    image: nginx:1.17
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./docker/log/nginx:/var/log/nginx
+      - ./docker/nginx/conf:/etc/nginx/conf.d
+      - ./docker/ssl:/etc/ssl
+      - ./:/var/www/html/shopping_cart
+
+  # php-fpm
+  php-fpm:
+    container_name: php
+    networks:
+      - backend
+    image: tinayork/php:8.0-fpm
+    expose:
+      - 9000
+    tty: true
+    volumes:
+      - ./docker/php/conf.d/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./docker/php/conf.d/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+      - ./docker/php/php-fpm.d:/usr/local/etc/php-fpm.d
+      - ./docker/ssl:/etc/ssl
+      - ./:/var/www/html/shopping_cart
+
+  # database
+  database:
+    container_name: mysql
+    networks:
+      - backend
+    ports:
+      - "3306:3306"
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: db
+      MYSQL_USER: test
+      MYSQL_PASSWORD: test
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./docker/mysql/local.cnf:/etc/mysql/conf.d/local.cnf
+      - ./docker/mysql/data:/var/lib/mysql
