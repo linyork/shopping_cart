@@ -65,7 +65,8 @@ class Cart
     {
         if ( is_numeric($product) )
         {
-            $this->add_product((resolve(Product::class, ["id" => $product]))->set_discount_class_name(static::class));
+            $this->product_list[static::class][] = (resolve(Product::class, ["id" => $product]))
+                ->set_discount_class_name(static::class);
         }
         elseif ( $product instanceof Product )
         {

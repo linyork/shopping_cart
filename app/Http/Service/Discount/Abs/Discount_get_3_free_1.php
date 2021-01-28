@@ -13,14 +13,10 @@ abstract class Discount_get_3_free_1 extends Discount
     public function run_rule(Cart $cart) : void
     {
         $count_coder_at_work = $cart->get_quantity($this->get_free_id);
-        $free_count          = ($count_coder_at_work >= 3) ? floor($count_coder_at_work / 3) : 0;
 
-        if ( $free_count )
+        for ($i = 0; $i < ($count_coder_at_work >= 3) ? floor($count_coder_at_work / 3) : 0; $i++)
         {
-            for ($i = 0; $i < $free_count; $i++)
-            {
-                $cart->add_product($this->create_discount_product());
-            }
+            $cart->add_product($this->create_discount_product());
         }
     }
 
