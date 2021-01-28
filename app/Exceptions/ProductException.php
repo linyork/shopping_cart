@@ -13,8 +13,6 @@ class ProductException extends Exception
 
     public function render()
     {
-        return response()->json([
-            'message' => $this->getMessage()
-        ], 500);
+        abort(403, $this->getMessage());
     }
 }
